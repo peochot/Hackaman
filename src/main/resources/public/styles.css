@@ -1,0 +1,82 @@
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+body {
+    padding: 50px;
+    box-sizing: border-box;
+    font-size: 32px;
+    font-weight: normal;
+    line-height: 1.5;
+    font-family: "VT323", monospace;
+    background: radial-gradient(#333, #111);
+    color: #59b9ff;
+    text-shadow: 0 0 10px #59b9ff;
+}
+body:before,
+body:after {
+    content: '';
+    pointer-events: none;
+    display: block;
+    position: absolute;
+    z-index: 999;
+}
+body:before {
+    background: repeating-linear-gradient(transparent, transparent 2px, rgba(0, 0, 0, .2) 0, rgba(0, 0, 0, .2) 4px);
+    top: -4px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    animation: roll 400ms linear infinite;
+}
+body:after {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .02), rgba(255, 255, 255, 0));
+    animation: slide 1400ms linear infinite;
+}
+#log {
+    white-space: pre-wrap;
+}
+#log,
+form {
+    display: inline;
+}
+#terminal {
+    height: 100%;
+    overflow: auto;
+}
+#hiddenInput {
+    position: fixed;
+    left: -100vw;
+    bottom: 0;
+}
+#cursor {
+    display: inline-block;
+    background: #59b9ff;
+    width: 1em;
+    height: 1.5em;
+    vertical-align: bottom;
+    box-shadow: 0 0 10px #59b9ff;
+    animation: blink 800ms infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    60% { opacity: 1; }
+    100% { opacity: 0; }
+}
+@keyframes roll {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(3px); }
+}
+@keyframes slide {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100vh); }
+}
