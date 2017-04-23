@@ -1,7 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS hakaman;
 CREATE TABLE user (
     id UUID DEFAULT RANDOM_UUID() PRIMARY KEY,
-    name VARCHAR NOT NULL,
-
-    UNIQUE (name)
+    username VARCHAR NOT NULL,
+    password VARCHAR NOT NULL,
+    UNIQUE (username)
 );

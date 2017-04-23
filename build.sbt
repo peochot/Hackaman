@@ -10,6 +10,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-actor" % akkaVersion,
     "com.typesafe.akka" %% "akka-remote" % akkaVersion,
     "com.typesafe.akka" %% "akka-testkit" % akkaVersion,
+    "de.heikoseeberger" %% "akka-http-circe" % "1.15.0",
     "com.typesafe.akka" %% "akka-http" % "10.0.5",
     "com.typesafe.akka" %% "akka-http-spray-json" % "10.0.4",
     "com.h2database"  %  "h2" % "1.4.193",

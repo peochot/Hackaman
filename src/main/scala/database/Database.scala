@@ -71,7 +71,7 @@ object Database {
       return Option(extractor(resultSet))
     }
 
-    return None
+    None
   }
 
   def findAll[T](sql: String, extractor: (ResultSet) => T): List[T] = {
