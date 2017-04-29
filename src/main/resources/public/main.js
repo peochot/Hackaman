@@ -24,6 +24,7 @@
             console.log(Store.getState())
         }
     )
+    
 
     var loginCheck = function() {
         var state = Store.getState();
@@ -38,21 +39,48 @@
         console.log(Store.getState())
     }
 
-    var hiddenInput = document.querySelector('#hiddenInput');
-    var spanInput = document.querySelector('#input');
-    var form = document.querySelector('form');
-    hiddenInput.focus();
-    hiddenInput.addEventListener('keydown', function(e) {
-        // Prevent arrow keys.
-        if ([37, 38, 39, 40].indexOf(e.keyCode) !== -1) {
+    var $ = function(el) {
+        return document.querySelector(el);
+    }
+
+    var Terminal = function () {
+        this.element = $('#terminal');
+        this.hiddenInput = $('#hiddenInput');
+        this.spanInput = $('#input');
+        this.form = $('form');
+
+        this.hiddenInput.focus();
+        this.hiddenInput.addEventListener('keydown', function(e) {
+            // Prevent arrow keys.
+            if ([37, 38, 39, 40].indexOf(e.keyCode) !== -1) {
+                e.preventDefault();
+            }
+        });
+
+        var $this = this;
+        this.hiddenInput.addEventListener('input', function() {
+            $this.copyValue();
+        });
+
+        this.form.addEventListener('submit', function(e) {
             e.preventDefault();
-        }
-    });
-    hiddenInput.addEventListener('input', function() {
-        copyValue(hiddenInput, spanInput);
-    });
+            submit($this.hiddenInput.value);
+            $this.form.reset();
+        });
+    }
+
+    Terminal.prototype.scrollToBottom = function () {
+        this.element.scrollTop = this.element.scrollHeight - this.element.clientHeight;
+    }
+
+    Terminal.prototype.copyValue = function () {
+        this.spanInput.textContent = this.hiddenInput.value;
+    }
+
+    var terminal = new Terminal();
+
     document.addEventListener('click', function() {
-        hiddenInput.focus();
+        terminal.hiddenInput.focus();
     });
 
     var type = function (element, msg) {
@@ -62,10 +90,6 @@
                 type(element, msg.substring(1));
             }, 10);
         }
-    }
-
-    var copyValue = function (input, span) {
-        span.textContent = input.value;
     }
 
     var appendLog = function (msg, className) {
@@ -78,7 +102,7 @@
         }
         span.className = className || '';
         log.appendChild(span);
-        scrollToBottom();
+        terminal.scrollToBottom();
     }
 
     var clearLog = function () {
@@ -88,11 +112,6 @@
     var disconnected = function () {
         appendLog('--- DISCONNECTED', 'response');
 
-    }
-
-    var scrollToBottom = function () {
-        var terminal = document.querySelector('#terminal');
-        terminal.scrollTop = terminal.scrollHeight - terminal.clientHeight;
     }
 
     var request = function (method, url, data) {
@@ -158,11 +177,6 @@
             input.textContent = '';
         }
     }
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        submit(hiddenInput.value);
-        form.reset();
-    });
 
     ///////////////////////////////////////////
     appendLog('Welcome to Hackaman game\n', 'response');
