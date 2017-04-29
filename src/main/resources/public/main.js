@@ -142,7 +142,7 @@
             } else if(!state.auth) {
                 var password = hiddenInput.value
                 appendLog(text + '\n');
-                request("post", "http://localhost:8080/api/login", {username: state.username, password: password})
+                request("post", "http://localhost:9999/api/login", {username: state.username, password: password})
                     .then(function(response) {
                         console.log("Test", response);
                         Store.dispatch({type: "@logged/in"});

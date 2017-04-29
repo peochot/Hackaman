@@ -4,7 +4,7 @@ import database.Database
 import org.apache.commons.dbcp2.BasicDataSourceFactory
 import java.util.Properties
 
-import actors.AuthActor
+import actors.{AuthActor, InputAnalyzer, Test, Validator}
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
@@ -45,13 +45,16 @@ object Main {
 
     val userRepo = new UserRepository
     val authActor = system.actorOf(Props(new AuthActor(userRepo)), "auth")
+
+    val tester = system.actorOf(Props(new Test(userRepo)), "test")
+    val inputAnalyzer = system.actorOf(Props(new InputAnalyzer(tester)), "analyzer")
+    val validator = system.actorOf(Props(new Validator(inputAnalyzer)), "validator")
+
     val static = new StaticRouter
-    val api = new ApiRouter(authActor)
+    val api = new ApiRouter(authActor, validator)
     val routes = static.route ~ api.route
 
-    //Database.findAll("SELECT * from user", test)
-
-    Http().bindAndHandle(routes, "localhost", 8080)
+    Http().bindAndHandle(routes, "localhost", 9999)
   }
 
   def test(rs: ResultSet): Unit ={
