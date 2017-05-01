@@ -6,14 +6,14 @@ import java.sql.ResultSet
 /**
   * Created by beochot on 4/23/2017.
   */
-case class User(username: String, password: String)
-case class UserWithoutPassword(username: String)
+case class User(username: String, score: Long, stage: Long)
+case class UserPass(username: String, password: String)
 
-object UserWithoutPassword {
-  def fromResultSet(rs: ResultSet): UserWithoutPassword = UserWithoutPassword(rs.getString("username"))
+object User {
+  def fromResultSet(rs: ResultSet): User = User(rs.getString("username"), rs.getLong("score"), rs.getLong("stageId"))
 }
 
 object UserJsonProtocol extends DefaultJsonProtocol{
-  implicit val userFormat = jsonFormat2(User)
-  implicit val userWithoutPassFormat = jsonFormat1(UserWithoutPassword.apply)
+  implicit val userFormat = jsonFormat2(UserPass)
+  implicit val userWithoutPassFormat = jsonFormat3(User.apply)
 }
