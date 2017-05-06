@@ -20,6 +20,7 @@ CREATE TABLE answer (
   questionId LONG NOT NULL,
   charkey VARCHAR NOT NULL,
   content VARCHAR NOT NULL,
+  correct BOOLEAN DEFAULT false,
   FOREIGN KEY (questionId) REFERENCES question(id),
   UNIQUE (charkey, content)
 );

@@ -10,7 +10,7 @@ import repository.UserRepository
 class AuthActor(val userRepository: UserRepository) extends Actor {
     def receive = {
         case u: UserPass =>
-            userRepository.findUser(u.username, u.password) match {
+            userRepository.findAuthUser(u.username, u.password) match {
                 case Some(user) => sender() ! SuccessAuth(s"Welcome ${user.username}", user.username, newUser = false)
                 case None =>
                     userRepository.createUser(u.username, u.password) match {
