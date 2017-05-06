@@ -15,6 +15,6 @@ case class CommandWithSender(command: String, sender: ActorRef, username: String
 
 case class Command(command: String) extends AbstractCommand
 
-object CommandProtocol extends DefaultJsonProtocol{
-    implicit val command = jsonFormat1(Command)
+object CommandProtocol extends DefaultJsonProtocol {
+    implicit val commandFormat = jsonFormat1(Command)
 }

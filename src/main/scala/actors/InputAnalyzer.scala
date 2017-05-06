@@ -6,11 +6,10 @@ import domain.CommandWithSender
 /**
   * Created by pnguyenhuy on 29/04/17.
   */
-class InputAnalyzer(val pipe: ActorRef) extends Actor {
+class InputAnalyzer(val commandAnalyzer: ActorRef, answerAnalyzer: ActorRef) extends Actor {
     def receive = {
-        case test@CommandWithSender("list", sender, username) => {
-            println(test)
-            pipe ! test
-        }
+        case command@CommandWithSender(input, _, _) if input startsWith "-"  =>  commandAnalyzer ! command.copy(command = input.substring(1))
+        case answer@CommandWithSender => answerAnalyzer ! answer
+        case _ =>  sender() ! "error"
     }
 }
