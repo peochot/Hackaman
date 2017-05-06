@@ -1,12 +1,14 @@
 package actors
 
+import akka.actor.Actor
 import domain.{CommandWithSender, ListUserResponse, User}
 import repository.{AnswerRepository, UserRepository}
 
 /**
   * Created by beochot on 5/1/2017.
   */
-class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerRepository) {
+
+class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerRepository) extends Actor {
     def receive = {
         case CommandWithSender("list", sender, username) =>  {
             val optionUser = userRepository.getUserState(username)
