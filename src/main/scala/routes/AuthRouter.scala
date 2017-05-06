@@ -37,10 +37,7 @@ class AuthRouter(val authActor: ActorRef) extends SprayJsonSupport {
         onComplete(authActor ? user) {
             case util.Success(result) =>
                 result match {
-                    case Some(success: SuccessAuth) =>
-                        setCookie(HttpCookie("secret", value = Base64.getEncoder.encodeToString(success.username.getBytes(StandardCharsets.UTF_8)))) {
-                            complete(success)
-                        }
+                    case Some(success: SuccessAuth) => complete(s"{hackme: ${Base64.getEncoder.encodeToString(success.username.getBytes(StandardCharsets.UTF_8))}}")
                     case f: FailedAuth => complete(500, f.cause)
                 }
 
