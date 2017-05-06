@@ -14,7 +14,7 @@ class UserRepository {
         """SELECT * FROM user WHERE username = '%s' JOIN question ON user.stageId = question.id"""
 
     def createUser(username: String, password: String) =
-        Database.insert(CREATE_USER.format(username, password), User.apply)
+        Database.insert(CREATE_USER.format(username, password), User.fromResult)
 
     def findAuthUser(username: String, password: String): Option[User] =
         Database.findOne(GET_AUTH_USER.format(username, password), User.fromResult)

@@ -3,14 +3,15 @@ import java.sql.{Connection, DriverManager, ResultSet}
 import database.Database
 import org.apache.commons.dbcp2.BasicDataSourceFactory
 import java.util.Properties
+
 import scala.util.{Properties => SProperties}
-import actors.{AuthActor, InputAnalyzer, Test, Validator}
+import actors._
 import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import org.h2.tools.RunScript
-import repository.UserRepository
+import repository.{AnswerRepository, UserRepository}
 import routes.{ApiRouter, StaticRouter}
 
 import scala.concurrent.duration._
@@ -43,10 +44,12 @@ object Main {
         implicit val actorMaterializer = ActorMaterializer()
 
         val userRepo = new UserRepository
+        val answerRepo = new AnswerRepository
         val authActor = system.actorOf(Props(new AuthActor(userRepo)), "auth")
 
-        val tester = system.actorOf(Props(new Test(userRepo)), "test")
-        val inputAnalyzer = system.actorOf(Props(new InputAnalyzer(tester)), "analyzer")
+        val answerAnalyzer = system.actorOf(Props(new AnswerAnalyzer(userRepo)), "answerAnalyzer");
+        val commandAnalyzer = system.actorOf(Props(new CommandAnalyzer(userRepo, answerRepo)), "commandAnalyzer");
+        val inputAnalyzer = system.actorOf(Props(new InputAnalyzer(commandAnalyzer, answerAnalyzer)), "analyzer")
         val validator = system.actorOf(Props(new Validator(inputAnalyzer)), "validator")
 
         val static = new StaticRouter
