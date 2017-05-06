@@ -8,7 +8,7 @@ import akka.http.scaladsl.server.Directives._
   */
 class ApiRouter(val authActor: ActorRef, val validator: ActorRef) {
   val authRouter = new AuthRouter(authActor)
-  val commandRouter = new CommandRouter(validator)
+  val commandRouter = new GameRouter(validator)
 
   val route =
       pathPrefix("api") {
