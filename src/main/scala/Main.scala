@@ -24,8 +24,8 @@ import scala.concurrent.duration._
   */
 object Main {
     def main(args: Array[String]): Unit = {
-        //val JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
-        val JDBC_URL = "jdbc:h2:./db/hakaman;AUTO_SERVER=TRUE"
+        val JDBC_URL = "jdbc:h2:mem:test;DB_CLOSE_DELAY=-1"
+        //val JDBC_URL = "jdbc:h2:./db/hakaman;AUTO_SERVER=TRUE"
         val JDBC_INIT = s"$JDBC_URL;MODE=MySQL;INIT=RUNSCRIPT FROM 'classpath:create.sql';"
 
         Class.forName("org.h2.Driver")
@@ -58,6 +58,7 @@ object Main {
         val port = SProperties.envOrElse("PORT", "9999").toInt
 
         Http().bindAndHandle(routes, "localhost", port)
+        println(s"Server is running at localhost:$port")
     }
 
 }

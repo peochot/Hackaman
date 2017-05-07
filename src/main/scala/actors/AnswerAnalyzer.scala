@@ -2,7 +2,7 @@ package actors
 
 import akka.actor.Actor
 import database.Database
-import domain.{CommandWithSender, Question, Response}
+import domain.{CommandWithSender, Question, Response, User}
 import repository.{AnswerRepository, UserRepository}
 
 /**
@@ -20,26 +20,21 @@ class AnswerAnalyzer(userRepository: UserRepository, answerRepository: AnswerRep
                 val correctAnswer = answerRepository.getAnswers(state.stage).filter(option => option.correct).head.key
 
                 if (correctAnswer == answer.toUpperCase) {
-
-                    val cac = userRepository.updateStage(state.stage + 1, username)
-                    println(cac)
-                    val newState = userRepository.getUserState(username).getOrElse(state)
-                    if (newState.stage != state.stage) {
-
+                    userRepository.updateStage(state.stage + 1, username)
+                    userRepository.getUserState(username).map((newState) => {
                         val newAnswers = answerRepository.getAnswers(newState.stage)
                         val nextQuestion = Question(newState.stage, newState.question, newAnswers)
-                        println("kec")
+
                         Response("Correct ! \n".concat(nextQuestion.toString), newState.toUser, clear = true)
-                    }
+                    }).getOrElse(
+                        Response("Congratulations. You have pass all the tests \n", User(username, 0, 0), end = true)
+                    )
                 } else {
                     val question = Question(state.stage, state.question, availableAnswers)
-
-                    val answersContent = availableAnswers.map(option => option.content)
                     Response("Wrong answer. Try again !! \n".concat(question.toString), state.toUser)
                 }
-            }).getOrElse(
-                Response("Congratulations. You have pass all the tests \n", null, clear = true, end = true)
-            )
+            }).get
+
             sender ! response
         case CommandWithSender(_, sender, _) => sender ! "Error"
     }
