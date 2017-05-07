@@ -15,16 +15,24 @@ class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerR
             val users = userRepository.getUsers()
             sender ! Response(composeRankMessage(users), User(username, 0, 0), clear = true)
         case CommandWithSender("start", sender, username) =>
-            val optionUser = userRepository.getUserState(username)
-            val response = optionUser.map(userState =>  {
-                val answers = answerRepository.getAnswers(userState.stage)
-                val question = Question(userState.stage, userState.question, answers)
-                Response(question.toString, userState.toUser)
+            val user = userRepository.checkUser(username).map((user) => {
+                userRepository.getUserState(username).map(userState =>  {
+                    val answers = answerRepository.getAnswers(user.stage)
+                    val question = Question(userState.stage, userState.question, answers)
+                    Response(question.toString, userState.toUser)
+                }).getOrElse(
+                    Response("Congratulations. You have passed all the tests \n", User(username, 0, 0), end = true)
+                )
             }).getOrElse(
-                Response("Congratulations. You have pass all the tests \n", User(username, 0, 0), end = true)
+                Response("Invalid credentials \n", User(username, 0, 0))
             )
 
+            val response = user
             sender ! response
+
+        case CommandWithSender("reset", sender, username) =>
+            userRepository.updateStage(0, 0,username)
+            sender ! Response("Reset !!!\n", User(username, 0, 0))
         case CommandWithSender(_, sender, _) =>
             sender ! "error"
     }
