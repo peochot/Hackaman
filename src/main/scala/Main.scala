@@ -57,7 +57,7 @@ object Main {
 
         val port = SProperties.envOrElse("PORT", "9999").toInt
 
-        Http().bindAndHandle(routes, "localhost", port)
+        Http().bindAndHandle(routes, "0.0.0.0", port)
         println(s"Server is running at localhost:$port")
     }
 
