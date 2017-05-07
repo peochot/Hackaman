@@ -20,7 +20,7 @@ class AnswerAnalyzer(userRepository: UserRepository, answerRepository: AnswerRep
                 val correctAnswer = answerRepository.getAnswers(state.stage).filter(option => option.correct).head.key
 
                 if (correctAnswer == answer.toUpperCase) {
-                    userRepository.updateStage(state.stage + 1, state.score + 100,username)
+                    userRepository.updateStage(state.stage + 1, state.score + 100, username)
                     userRepository.getUserState(username).map((newState) => {
                         val newAnswers = answerRepository.getAnswers(newState.stage)
                         val nextQuestion = Question(newState.stage, newState.question, newAnswers)
