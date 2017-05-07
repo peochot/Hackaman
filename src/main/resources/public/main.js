@@ -1,13 +1,14 @@
 (function() {
 
     var createStore = Redux.createStore
-    var initState = {auth: false, username: ""}
-    var reducer =  function (state, action) {
-        switch (action.type){
+    var initState = { auth: false, username: "" }
+    var reducer = function (state, action) {
+        switch (action.type) {
             case "@username/set":
-                return Object.assign(state, {username: action.username})
+                return Object.assign(state, { username: action.username })
             case "@logged/in":
-                return Object.assign(state, {auth: true})
+                
+                return Object.assign(state, { auth: true })
             default:
                 return initState
         }
@@ -15,23 +16,23 @@
 
     var Store = createStore(reducer)
 
-    var unsubscribe = Store.subscribe(function(){
-            console.log(Store.getState())
-        }
+    var unsubscribe = Store.subscribe(function () {
+        console.log(Store.getState())
+    }
     )
-    
 
-    var loginCheck = function() {
+
+    var loginCheck = function () {
         var state = Store.getState();
         if (!state.auth && !state.username) {
             appendLog('Please fill your username and password to login or register\n', 'response');
             appendLog('Enter username: ', 'response');
-        } else if(!state.auth) {
+        } else if (!state.auth) {
             appendLog('Enter password: ', 'response');
         }
     }
 
-    var $ = function(el) {
+    var $ = function (el) {
         return document.querySelector(el);
     }
 
@@ -42,7 +43,7 @@
         this.form = $('form');
 
         this.hiddenInput.focus();
-        this.hiddenInput.addEventListener('keydown', function(e) {
+        this.hiddenInput.addEventListener('keydown', function (e) {
             // Prevent arrow keys.
             if ([37, 38, 39, 40].indexOf(e.keyCode) !== -1) {
                 e.preventDefault();
@@ -50,11 +51,11 @@
         });
 
         var $this = this;
-        this.hiddenInput.addEventListener('input', function() {
+        this.hiddenInput.addEventListener('input', function () {
             $this.copyValue();
         });
 
-        this.form.addEventListener('submit', function(e) {
+        this.form.addEventListener('submit', function (e) {
             e.preventDefault();
             submit($this.hiddenInput.value);
             $this.form.reset();
@@ -71,7 +72,7 @@
 
     var terminal = new Terminal();
 
-    document.addEventListener('click', function() {
+    document.addEventListener('click', function () {
         terminal.hiddenInput.focus();
     });
 
@@ -85,20 +86,20 @@
     }
 
     var appendLog = function (msg, className) {
-        var log = document.querySelector('#log');
+        var log = $('#log');
         var span = document.createElement('span');
         if (className === 'response') {
             type(span, msg);
         } else {
             span.innerHTML = msg;
         }
-        span.className = className || '';
+        span.className = className || '';
         log.appendChild(span);
         terminal.scrollToBottom();
     }
 
     var clearLog = function () {
-        document.querySelector('#log').innerHTML = '';
+        $('#log').innerHTML = '';
     }
 
     var disconnected = function () {
@@ -114,7 +115,9 @@
                 xhr.setRequestHeader("secret", localStorage.getItem("secret"));
             }
             xhr.setRequestHeader("Content-type", "application/json");
+            xhr.setRequestHeader('Access-Control-Expose-Headers','Set-Cookie');
             xhr.timeout = 5000;
+            xhr.withCredentials = true;
             xhr.onreadystatechange = function () {
                 if (xhr.readyState !== XMLHttpRequest.DONE) {
                     return;
@@ -122,20 +125,21 @@
 
                 if (xhr.status === 200) {
                     if (xhr.responseText && xhr.responseText.length > 0) {
+                        console.log('Response header',xhr.getResponseHeader('Set-Cookie'));
                         var json = JSON.parse(xhr.responseText);
                         resolve(json);
                     } else {
                         resolve();
                     }
                 } else {
-                    reject({failure: true});
+                    reject({ failure: true });
                 }
             };
             xhr.onerror = function (e) {
-                reject({error: true, cause: e});
+                reject({ error: true, cause: e });
             };
             xhr.ontimeout = function (e) {
-                reject({timeout: true, cause: e});
+                reject({ timeout: true, cause: e });
             };
 
             if (data) {
@@ -146,14 +150,14 @@
         });
     };
 
-    var submit = function(text) {
+    var submit = function (text) {
         if (text.length > 0) {
             var state = Store.getState();
             if (!state.auth && !state.username) {
-                Store.dispatch({type: "@username/set", username: hiddenInput.value})
+                Store.dispatch({ type: "@username/set", username: hiddenInput.value })
                 appendLog(text + '\n');
                 loginCheck();
-            } else if(!state.auth) {
+            } else if (!state.auth) {
                 var password = hiddenInput.value
                 appendLog(text + '\n');
                 request("post", "http://localhost:9999/api/login", {username: state.username, password: password})
@@ -188,6 +192,7 @@
                 console.error(e);
             });
     }
+
     ///////////////////////////////////////////
     appendLog('Welcome to Hackaman game\n', 'response');
     if (localStorage.getItem("secret")) {
