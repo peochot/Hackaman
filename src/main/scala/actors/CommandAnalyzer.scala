@@ -26,7 +26,7 @@ class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerR
                 val question = Question(userState.stage, userState.question, answers)
                 Response(question.toString, userState.toUser)
             }).getOrElse(
-                Response("Congratulations. You have pass all the tests \n", null, end = true)
+                Response("Congratulations. You have pass all the tests \n", User(username, 0, 0), end = true)
             )
 
             sender ! response
