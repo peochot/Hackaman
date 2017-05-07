@@ -13,12 +13,7 @@ class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerR
     def receive = {
         case CommandWithSender("leaderboard", sender, username) =>
             val users = userRepository.getUsers()
-            val optionUser = userRepository.getUserState(username)
-            val response = optionUser.map(userState =>  {
-                Response(composeRankMessage(users), userState.toUser, clear = true)
-            }).get
-
-            sender ! response
+            sender ! Response(composeRankMessage(users), User(username, 0, 0), clear = true)
         case CommandWithSender("start", sender, username) =>
             val optionUser = userRepository.getUserState(username)
             val response = optionUser.map(userState =>  {
@@ -36,7 +31,7 @@ class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerR
 
     def composeRankMessage(users: List[User]): String =
         s"Current ranking : \n".concat(
-            users.foldLeft("")((acc, user) => acc.concat(s"${user.username} ---- Score: ${user.score} ---- Stage: ${user.score} \n"))
+            users.foldLeft("")((acc, user) => acc.concat(s"${user.username} ---- Score: ${user.score} ---- Stage: ${user.stage} \n"))
         )
 
 }
