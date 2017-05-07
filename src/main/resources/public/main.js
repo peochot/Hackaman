@@ -125,7 +125,6 @@
 
                 if (xhr.status === 200) {
                     if (xhr.responseText && xhr.responseText.length > 0) {
-                        console.log('Response header',xhr.getResponseHeader('Set-Cookie'));
                         var json = JSON.parse(xhr.responseText);
                         resolve(json);
                     } else {
@@ -182,9 +181,10 @@
     var sendText = function (text) {
         request("post", "http://localhost:9999/api/game", {command: text})
             .then(function(response) {
-                clearLog();
+                if(response.clear)
+                    clearLog();
                 appendLog(text + '\n');
-                console.log(response);
+                console.log(response)
                 appendLog(response.message);
             }).catch(function(e) {
                 Store.dispatch({type: "@username/clear"});
