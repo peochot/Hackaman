@@ -11,10 +11,8 @@ import java.nio.charset.StandardCharsets
 
 class Validator(val pipe: ActorRef) extends Actor {
     def receive = {
-        case c: CommandRequest => {
-            println(c.token)
-            val username = Base64.getDecoder.decode(c.token).toString
+        case c: CommandRequest =>
+            val username = new String(Base64.getDecoder.decode(c.token))
             pipe ! CommandWithSender(c.command, sender(), username)
-        }
     }
 }

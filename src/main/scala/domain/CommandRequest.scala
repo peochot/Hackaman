@@ -11,7 +11,7 @@ trait AbstractCommand
 
 case class CommandRequest(token: String, command: String) extends AbstractCommand
 
-case class CommandWithSender(command: String, sender: ActorRef, username: String) extends AbstractCommand
+case class CommandWithSender(command: String, origin: ActorRef, username: String) extends AbstractCommand
 
 case class Command(command: String) extends AbstractCommand
 

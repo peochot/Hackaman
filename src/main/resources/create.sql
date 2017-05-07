@@ -1,5 +1,5 @@
 CREATE SCHEMA IF NOT EXISTS hakaman;
-
+DROP TABLE IF EXISTS user;
 CREATE TABLE user (
     id LONG NOT NULL AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR NOT NULL,
@@ -9,12 +9,14 @@ CREATE TABLE user (
     UNIQUE (username)
 );
 
+DROP TABLE IF EXISTS question;
 CREATE TABLE question (
   id LONG NOT NULL AUTO_INCREMENT PRIMARY KEY,
   content VARCHAR NOT NULL,
   UNIQUE (content)
 );
 
+DROP TABLE IF EXISTS answer;
 CREATE TABLE answer (
   id LONG NOT NULL AUTO_INCREMENT PRIMARY KEY,
   questionId LONG NOT NULL,
@@ -24,5 +26,3 @@ CREATE TABLE answer (
   FOREIGN KEY (questionId) REFERENCES question(id),
   UNIQUE (charkey, content)
 );
-
-alter table user add constraint sk1 foreign key (stageId) references question(id);

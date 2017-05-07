@@ -11,5 +11,5 @@ class AnswerRepository {
         """SELECT * FROM answer WHERE questionId = %d"""
 
     def getAnswers(questionId: Long) =
-        Database.findAll(FIND_ANSWER.format(questionId), Answer.apply)
+        Database.findAll(FIND_ANSWER.format(questionId), Answer.fromResult)
 }

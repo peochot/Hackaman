@@ -8,5 +8,5 @@ import java.sql.ResultSet
 case class Answer (key: String, content: String, correct: Boolean)
 
 object Answer {
-    def apply(rs: ResultSet): Answer = new Answer(rs.getString("charkey"), rs.getString("content"), rs.getBoolean("correct"))
+    def fromResult(rs: ResultSet): Answer = new Answer(rs.getString("charkey"), rs.getString("content"), rs.getBoolean("correct"))
 }

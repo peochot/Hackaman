@@ -9,7 +9,7 @@ import domain.CommandWithSender
 class InputAnalyzer(val commandAnalyzer: ActorRef, answerAnalyzer: ActorRef) extends Actor {
     def receive = {
         case command@CommandWithSender(input, _, _) if input startsWith "-"  =>  commandAnalyzer ! command.copy(command = input.substring(1))
-        case answer@CommandWithSender => answerAnalyzer ! answer
-        case _ =>  sender() ! "error"
+        case answer@CommandWithSender(_, _, _) => answerAnalyzer ! answer
+        //case _ =>  sender ! "error"
     }
 }
