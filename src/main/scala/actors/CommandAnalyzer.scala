@@ -33,8 +33,24 @@ class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerR
         case CommandWithSender("reset", sender, username) =>
             userRepository.updateStage(0, 0,username)
             sender ! Response("Reset !!!\n", User(username, 0, 0))
+        case CommandWithSender(input, sender, username) if input.startsWith("find") =>
+            val response = if(input.length >= 5) {
+                val toFind = input.substring(5)
+                val found = userRepository.findUsers(toFind)
+                Response(composeFoundUsers(found), User(username, 0, 0))
+            } else {
+                Response("Invalid command \n", User(username, 0, 0))
+            }
+
+            sender ! response
         case CommandWithSender(_, sender, _) =>
             sender ! "error"
+    }
+    def composeFoundUsers(users: List[User]): String = if (users != null && users.length > 0){
+        s"Found : \n".concat(
+            users.foldLeft("")((acc, user) => acc.concat(s"${user.username} \n")))
+    } else {
+        "No user found\n"
     }
 
     def composeRankMessage(users: List[User]): String =

@@ -25,6 +25,7 @@ class UserRepository {
 
     def getUserState(username: String): Option[UserState] = Database.findOne(FIND_USER_STATE.format(username), UserState.fromResult)
     def checkUser(username: String) = Database.findOne(CHECK_USER.format(username), User.fromResult)
+    def findUsers(username: String) = Database.findAll(CHECK_USER.format(username), User.fromResult)
     def getUsers() = Database.findAll(ALL_USER, User.fromResult)
     def updateStage(stageId: Long, score: Long, username: String): Int =
         Database.update(UPDATE_USER_STAGE.format(stageId, score, username))
