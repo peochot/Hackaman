@@ -159,7 +159,7 @@
             } else if (!state.auth) {
                 var password = hiddenInput.value
                 appendLog(text + '\n');
-                request("post", "http://localhost:9999/api/login", {username: state.username, password: password})
+                request("post", "/api/login", {username: state.username, password: password})
                     .then(function(response) {
                         localStorage.setItem("secret", response.secret);
                         clearLog();
@@ -179,7 +179,7 @@
     }
 
     var sendText = function (text) {
-        request("post", "http://localhost:9999/api/game", {command: text})
+        request("post", "/api/game", {command: text})
             .then(function(response) {
                 if(response.clear)
                     clearLog();

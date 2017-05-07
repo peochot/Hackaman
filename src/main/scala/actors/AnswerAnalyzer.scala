@@ -13,7 +13,7 @@ class AnswerAnalyzer(userRepository: UserRepository, answerRepository: AnswerRep
     val validAnswers = List("A", "B", "C", "D", "E", "a", "b", "c", "d", "e")
 
     def receive = {
-        case CommandWithSender(answer, sender, username) if validAnswers.indexOf(answer) > 0 =>
+        case CommandWithSender(answer, sender, username) if validAnswers.indexOf(answer) > -1 =>
             val userState = userRepository.getUserState(username)
             val response = userState.map(state => {
                 val availableAnswers = answerRepository.getAnswers(state.stage)
