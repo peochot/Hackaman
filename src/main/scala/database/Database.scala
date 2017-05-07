@@ -3,7 +3,10 @@ package database
 import java.sql.Connection
 import java.sql.ResultSet
 import java.sql.Statement
+import java.util.Properties
 import javax.sql.DataSource
+
+import org.h2.jdbcx.JdbcConnectionPool
 
 import scala.util.Try
 
@@ -11,33 +14,33 @@ import scala.util.Try
   * Created by beochot on 4/22/2017.
   */
 object Database {
-    def init(dataSource: DataSource) = {
-        this.dataSource = dataSource
+    def init(properties: Properties) = {
+        this.connectionPool = JdbcConnectionPool.create(
+            properties.getProperty("url"), properties.getProperty("username"), properties.getProperty("password"))
+        //Temporary fix
+        this.connectionPool.setMaxConnections(9999)
     }
-
-    private var dataSource: DataSource = null
-    private val currentConnection = new ThreadLocal[Connection]()
+    private var connectionPool: JdbcConnectionPool = null
+    private var currentConnection: Connection = null
 
     /**
       * Opens new thread-local connection
       */
     def open(): Connection = {
-        val connection = dataSource.getConnection
-        currentConnection.set(connection)
-        connection
+        currentConnection = connectionPool.getConnection
+        currentConnection
     }
 
     /**
       * Returns current thread-local connection
       */
-    def current(): Connection = currentConnection.get()
+    def current(): Connection = currentConnection
 
     /**
       * Closes current thread-local connection
       */
     def close() {
-        currentConnection.get().close()
-        currentConnection.set(null)
+        currentConnection.close()
     }
 
     def transaction[T](block: () => T): T = {

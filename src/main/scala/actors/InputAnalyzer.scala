@@ -10,6 +10,6 @@ class InputAnalyzer(val commandAnalyzer: ActorRef, answerAnalyzer: ActorRef) ext
     def receive = {
         case command@CommandWithSender(input, _, _) if input startsWith "-"  =>  commandAnalyzer ! command.copy(command = input.substring(1))
         case answer@CommandWithSender(_, _, _) => answerAnalyzer ! answer
-        case _ =>  sender ! "error"
+        //case _ =>  sender ! "error"
     }
 }

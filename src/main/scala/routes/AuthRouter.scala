@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
   */
 
 class AuthRouter(val authActor: ActorRef) extends SprayJsonSupport with DefaultJsonProtocol {
-    implicit val timeout: Timeout = 3 seconds
+    implicit val timeout: Timeout = 10 seconds
     import domain.UserJsonProtocol._
     import domain.AuthProtocol._
 

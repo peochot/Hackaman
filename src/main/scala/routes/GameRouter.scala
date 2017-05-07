@@ -18,7 +18,7 @@ import scala.util.{Failure, Success}
   */
 
 class GameRouter(val validator: ActorRef) extends SprayJsonSupport {
-    implicit val timeout: Timeout = 3 seconds
+    implicit val timeout: Timeout = 10 seconds
     import domain.CommandProtocol._
     import domain.ResponseProtocol._
 
