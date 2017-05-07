@@ -1,10 +1,5 @@
 (function() {
- /*   var socket = io();
-    socket.on('message', function(msg) {
-        appendLog(msg, 'response');
-    });
-    socket.on('clear', clearLog);
-    socket.on('disconnect', disconnected);*/
+
     var createStore = Redux.createStore
     var initState = {auth: false, username: ""}
     var reducer =  function (state, action) {
@@ -33,10 +28,7 @@
             appendLog('Enter username: ', 'response');
         } else if(!state.auth) {
             appendLog('Enter password: ', 'response');
-        } else {
-            appendLog('Welcome ' + state.username);
         }
-        console.log(Store.getState())
     }
 
     var $ = function(el) {
@@ -85,7 +77,7 @@
 
     var type = function (element, msg) {
         if (msg.length > 0) {
-            element.textContent += msg.charAt(0);
+            element.innerHTML += msg.charAt(0);
             setTimeout(function() {
                 type(element, msg.substring(1));
             }, 10);
@@ -98,7 +90,7 @@
         if (className === 'response') {
             type(span, msg);
         } else {
-            span.textContent = msg;
+            span.innerHTML = msg;
         }
         span.className = className || '';
         log.appendChild(span);
@@ -118,6 +110,9 @@
         return new Promise(function (resolve, reject) {
             var xhr = new XMLHttpRequest();
             xhr.open(method, url, true);
+            if (localStorage.getItem("secret")) {
+                xhr.setRequestHeader("secret", localStorage.getItem("secret"));
+            }
             xhr.setRequestHeader("Content-type", "application/json");
             xhr.timeout = 5000;
             xhr.onreadystatechange = function () {
@@ -163,22 +158,47 @@
                 appendLog(text + '\n');
                 request("post", "http://localhost:9999/api/login", {username: state.username, password: password})
                     .then(function(response) {
-                        console.log("Test", response);
+                        localStorage.setItem("secret", response.secret);
+                        clearLog();
                         Store.dispatch({type: "@logged/in"});
-                        loginCheck();
-                    }).catch(function(e){
+                        appendLog(response.message)
+                        sendText("-start");
+                    }).catch(function(e) {
                         Store.dispatch({type: "@username/clear"});
                         loginCheck();
                         console.error(e);
                     });
             } else {
-                appendLog(text + '\n');
+                sendText(text);
             }
             input.textContent = '';
         }
     }
 
+    var sendText = function (text) {
+        request("post", "http://localhost:9999/api/game", {command: text})
+            .then(function(response) {
+                clearLog();
+                appendLog(text + '\n');
+                console.log(response);
+                appendLog(response.message);
+            }).catch(function(e) {
+                Store.dispatch({type: "@username/clear"});
+                loginCheck();
+                console.error(e);
+            });
+    }
     ///////////////////////////////////////////
     appendLog('Welcome to Hackaman game\n', 'response');
-    loginCheck();
+    if (localStorage.getItem("secret")) {
+        var username = atob(localStorage.getItem("secret"))
+        Store.dispatch({type: "@username/set", username: hiddenInput.value})
+        Store.dispatch({type: "@logged/in"});
+
+        appendLog("Welcome " + username)
+        sendText("-start")
+    }
+    else {
+        loginCheck();
+    }
 })();

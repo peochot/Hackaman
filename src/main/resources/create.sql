@@ -24,5 +24,3 @@ CREATE TABLE answer (
   FOREIGN KEY (questionId) REFERENCES question(id),
   UNIQUE (charkey, content)
 );
-
-alter table user add constraint sk1 foreign key (stageId) references question(id);

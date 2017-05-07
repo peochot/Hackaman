@@ -1,7 +1,8 @@
 package actors
 
 import akka.actor.Actor
-import domain.{CommandWithSender, ListUserResponse, User}
+import database.Database
+import domain._
 import repository.{AnswerRepository, UserRepository}
 
 /**
@@ -10,17 +11,32 @@ import repository.{AnswerRepository, UserRepository}
 
 class CommandAnalyzer (userRepository: UserRepository, answerRepository: AnswerRepository) extends Actor {
     def receive = {
-        case CommandWithSender("list", sender, username) =>  {
+        case CommandWithSender("leaderboard", sender, username) =>
+            val users = userRepository.getUsers()
             val optionUser = userRepository.getUserState(username)
             val response = optionUser.map(userState =>  {
-                val answers = answerRepository.getAnswers(userState.stage).map(answer => answer.content)
-                ListUserResponse(userRepository.getUsers(), userState.copy(answers = answers))
-            })
+                Response(composeRankMessage(users), userState.toUser, clear = true)
+            }).get
 
             sender ! response
-        }
-        case CommandWithSender(_, sender, _) =>  {
+        case CommandWithSender("start", sender, username) =>
+            val optionUser = userRepository.getUserState(username)
+            val response = optionUser.map(userState =>  {
+                val answers = answerRepository.getAnswers(userState.stage)
+                val question = Question(userState.stage, userState.question, answers)
+                Response(question.toString, userState.toUser, clear = true)
+            }).getOrElse(
+                Response("Congratulations. You have pass all the tests \n", null, clear = true, end = true)
+            )
+
+            sender ! response
+        case CommandWithSender(_, sender, _) =>
             sender ! "error"
-        }
     }
+
+    def composeRankMessage(users: List[User]): String =
+        s"Current ranking : \n".concat(
+            users.foldLeft("")((acc, user) => acc.concat(s"${user.username} ---- Score: ${user.score} ---- Stage: ${user.score} \n"))
+        )
+
 }

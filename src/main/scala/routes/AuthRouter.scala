@@ -19,7 +19,7 @@ import scala.util.{Failure, Success}
   */
 
 class AuthRouter(val authActor: ActorRef) extends SprayJsonSupport with DefaultJsonProtocol {
-    implicit val timeout: Timeout = 5 seconds
+    implicit val timeout: Timeout = 3 seconds
     import domain.UserJsonProtocol._
     import domain.AuthProtocol._
 
@@ -35,7 +35,7 @@ class AuthRouter(val authActor: ActorRef) extends SprayJsonSupport with DefaultJ
     private def process(user: UserPass) = {
         onComplete(authActor ? user) {
             case Success(result: SuccessAuth) => complete(result)
-            case Failure(ex) => complete("Nooooooooo")
+            case _ => complete(403, s"""{"error": "Invalid credentials"}""")
         }
     }
 }

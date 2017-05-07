@@ -47,7 +47,7 @@ object Main {
         val answerRepo = new AnswerRepository
         val authActor = system.actorOf(Props(new AuthActor(userRepo)), "auth")
 
-        val answerAnalyzer = system.actorOf(Props(new AnswerAnalyzer(userRepo)), "answerAnalyzer")
+        val answerAnalyzer = system.actorOf(Props(new AnswerAnalyzer(userRepo, answerRepo)), "answerAnalyzer")
         val commandAnalyzer = system.actorOf(Props(new CommandAnalyzer(userRepo, answerRepo)), "commandAnalyzer")
         val inputAnalyzer = system.actorOf(Props(new InputAnalyzer(commandAnalyzer, answerAnalyzer)), "analyzer")
         val validator = system.actorOf(Props(new Validator(inputAnalyzer)), "validator")
