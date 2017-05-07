@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     var createStore = Redux.createStore
     var initState = { auth: false, username: "" }
@@ -7,7 +7,6 @@
             case "@username/set":
                 return Object.assign(state, { username: action.username })
             case "@logged/in":
-                
                 return Object.assign(state, { auth: true })
             default:
                 return initState
@@ -79,7 +78,7 @@
     var type = function (element, msg) {
         if (msg.length > 0) {
             element.innerHTML += msg.charAt(0);
-            setTimeout(function() {
+            setTimeout(function () {
                 type(element, msg.substring(1));
             }, 10);
         }
@@ -115,7 +114,7 @@
                 xhr.setRequestHeader("secret", localStorage.getItem("secret"));
             }
             xhr.setRequestHeader("Content-type", "application/json");
-            xhr.setRequestHeader('Access-Control-Expose-Headers','Set-Cookie');
+            xhr.setRequestHeader('Access-Control-Expose-Headers', 'Set-Cookie');
             xhr.timeout = 5000;
             xhr.withCredentials = true;
             xhr.onreadystatechange = function () {
@@ -159,15 +158,16 @@
             } else if (!state.auth) {
                 var password = hiddenInput.value
                 appendLog(text + '\n');
-                request("post", "/api/login", {username: state.username, password: password})
-                    .then(function(response) {
+                request("post", "/api/login", { username: state.username, password: password })
+                    .then(function (response) {
+                        // Set user secret into localStorage !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                         localStorage.setItem("secret", response.secret);
                         clearLog();
-                        Store.dispatch({type: "@logged/in"});
+                        Store.dispatch({ type: "@logged/in" });
                         appendLog(response.message)
                         sendText("-start");
-                    }).catch(function(e) {
-                        Store.dispatch({type: "@username/clear"});
+                    }).catch(function (e) {
+                        Store.dispatch({ type: "@username/clear" });
                         loginCheck();
                         console.error(e);
                     });
@@ -178,29 +178,43 @@
         }
     }
 
+    var logOut = function () {
+        Store.dispatch({ type: '@username/clear' })
+        /// Clear user Secret if user wants to log out !!!!!
+        localStorage.clear();
+        clearLog();
+        appendLog('You are logged out ! ');
+        appendLog('Press F5 to restart !');        
+    }
+
     var sendText = function (text) {
-        request("post", "/api/game", {command: text})
-            .then(function(response) {
-                if(response.clear)
+        if (text === '-logout') {
+            logOut();
+            return;
+        }
+
+        request("post", "/api/game", { command: text })
+            .then(function (response) {
+                if (response.clear)
                     clearLog();
                 appendLog(text + '\n');
                 console.log(response)
                 appendLog(response.message);
-            }).catch(function(e) {
-                Store.dispatch({type: "@username/clear"});
+            }).catch(function (e) {
+                Store.dispatch({ type: "@username/clear" });
                 loginCheck();
                 console.error(e);
             });
     }
 
-    ///////////////////////////////////////////
     appendLog('Welcome to Hackaman game\n', 'response');
     if (localStorage.getItem("secret")) {
         var username = atob(localStorage.getItem("secret"))
-        Store.dispatch({type: "@username/set", username: hiddenInput.value})
-        Store.dispatch({type: "@logged/in"});
+        Store.dispatch({ type: "@username/set", username: hiddenInput.value })
+        Store.dispatch({ type: "@logged/in" });
 
         appendLog("Welcome " + username)
+        appendLog("\nAvailable Command: \n-start to start game\n-reset to reset your score\n-leaderboard to show scoreboard\n-logout to log out \n Have fun \n");
         sendText("-start")
     }
     else {
